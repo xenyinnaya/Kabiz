@@ -9,6 +9,7 @@ import '../database/database_helper.dart';
 import '../repositories/product_repository.dart';
 import '../repositories/customer_repository.dart';
 import '../repositories/expense_repository.dart';
+import '../repositories/debt_repository.dart';
 import 'assistant_service.dart';
 
 class BusinessProvider extends ChangeNotifier {
@@ -16,6 +17,7 @@ class BusinessProvider extends ChangeNotifier {
   final ProductRepository _productRepository = ProductRepository();
   final CustomerRepository _customerRepository = CustomerRepository();
   final ExpenseRepository _expenseRepository = ExpenseRepository();
+  final DebtRepository _debtRepository = DebtRepository();
   final AssistantService _assistant = LocalAssistantService();
 
   List<Product> products = [];
@@ -37,11 +39,11 @@ class BusinessProvider extends ChangeNotifier {
     customers = await _customerRepository.getCustomers();
     sales = await _db.getAllSalesWithCustomers();
     expenses = await _expenseRepository.getExpenses();
-    debts = await _db.getAllDebtsWithCustomers();
+    debts = await _debtRepository.getDebtsWithCustomers();
 
     todaySalesTotal = await _db.getTodaySalesTotal();
     expensesThisMonthTotal = await _db.getExpensesThisMonthTotal();
-    outstandingDebtsTotal = await _db.getOutstandingDebtsTotal();
+    outstandingDebtsTotal = await _debtRepository.getOutstandingDebtsTotal();
     notifyListeners();
   }
 
@@ -77,12 +79,12 @@ class BusinessProvider extends ChangeNotifier {
   }
 
   Future<void> addDebt(Debt d) async {
-    await _db.insertDebt(d);
+    await _debtRepository.createDebt(d);
     await refreshData();
   }
 
   Future<void> updateDebt(int debtId, String status) async {
-    await _db.updateDebtStatus(debtId, status);
+    await _debtRepository.updateDebtStatus(debtId, status);
     await refreshData();
   }
 
