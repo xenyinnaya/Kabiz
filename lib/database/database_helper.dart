@@ -6,6 +6,7 @@ import '../models/sale.dart';
 import '../models/sale_item.dart';
 import '../models/expense.dart';
 import '../models/debt.dart';
+import '../models/inventory_transaction.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -24,9 +25,27 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'bujumbura_business.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE inventory_transactions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          product_id INTEGER NOT NULL,
+          type TEXT NOT NULL,
+          quantity REAL NOT NULL,
+          reference_id INTEGER,
+          note TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY(product_id) REFERENCES products(id)
+        )
+      ''');
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -171,6 +190,26 @@ class DatabaseHelper {
     return await db.insert('customers', c.toMap());
   }
 
+  // INVENTORY TRANSACTIONS
+  Future<int> insertInventoryTransaction(InventoryTransaction transaction) async {
+    final db = await database;
+    return await db.insert('inventory_transactions', transaction.toMap());
+  }
+
+  Future<List<InventoryTransaction>> getInventoryTransactions(int productId) async {
+    final db = await database;
+    final maps = await db.query(
+      'inventory_transactions',
+      where: 'product_id = ?',
+      whereArgs: [productId],
+      orderBy: 'created_at DESC',
+    );
+    return List.generate(
+      maps.length,
+      (index) => InventoryTransaction.fromMap(maps[index]),
+    );
+  }
+
   // SALES
   Future<int> insertSale(Sale sale, List<SaleItem> items) async {
     final db = await database;
@@ -189,6 +228,18 @@ class DatabaseHelper {
           final newStock = (p.stockQuantity - item.quantity);
           await txn.update('products', {'stock_quantity': newStock < 0 ? 0 : newStock}, where: 'id = ?', whereArgs: [p.id]);
         }
+        
+        await txn.insert(
+          'inventory_transactions',
+          {
+            'product_id': item.productId,
+            'type': 'sale',
+            'quantity': item.quantity,
+            'reference_id': saleId,
+            'note': 'Sale transaction',
+            'created_at': DateTime.now().toIso8601String(),
+          },
+        );
       }
     });
     return saleId;
