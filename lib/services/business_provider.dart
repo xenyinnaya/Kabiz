@@ -10,7 +10,7 @@ import '../repositories/product_repository.dart';
 import '../repositories/customer_repository.dart';
 import '../repositories/expense_repository.dart';
 import '../repositories/debt_repository.dart';
-import '../repositories/sales_repository.dart';
+import 'sales_service.dart';
 import 'assistant_service.dart';
 
 class BusinessProvider extends ChangeNotifier {
@@ -19,7 +19,7 @@ class BusinessProvider extends ChangeNotifier {
   final CustomerRepository _customerRepository = CustomerRepository();
   final ExpenseRepository _expenseRepository = ExpenseRepository();
   final DebtRepository _debtRepository = DebtRepository();
-  final SalesRepository _salesRepository = SalesRepository();
+  final SalesService _salesService = SalesService();
   final AssistantService _assistant = LocalAssistantService();
 
   List<Product> products = [];
@@ -39,7 +39,7 @@ class BusinessProvider extends ChangeNotifier {
   Future<void> refreshData() async {
     products = await _productRepository.getProducts();
     customers = await _customerRepository.getCustomers();
-    sales = await _salesRepository.getSalesWithCustomers();
+    sales = await _salesService.getSales();
     expenses = await _expenseRepository.getExpenses();
     debts = await _debtRepository.getDebtsWithCustomers();
 
@@ -71,7 +71,7 @@ class BusinessProvider extends ChangeNotifier {
   }
 
   Future<void> addSale(Sale sale, List<SaleItem> items) async {
-    await _salesRepository.createSale(sale, items);
+    await _salesService.createSale(sale, items);
     await refreshData();
   }
 
