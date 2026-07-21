@@ -8,12 +8,14 @@ import '../models/debt.dart';
 import '../database/database_helper.dart';
 import '../repositories/product_repository.dart';
 import '../repositories/customer_repository.dart';
+import '../repositories/expense_repository.dart';
 import 'assistant_service.dart';
 
 class BusinessProvider extends ChangeNotifier {
   final DatabaseHelper _db = DatabaseHelper();
   final ProductRepository _productRepository = ProductRepository();
   final CustomerRepository _customerRepository = CustomerRepository();
+  final ExpenseRepository _expenseRepository = ExpenseRepository();
   final AssistantService _assistant = LocalAssistantService();
 
   List<Product> products = [];
@@ -34,7 +36,7 @@ class BusinessProvider extends ChangeNotifier {
     products = await _productRepository.getProducts();
     customers = await _customerRepository.getCustomers();
     sales = await _db.getAllSalesWithCustomers();
-    expenses = await _db.getAllExpenses();
+    expenses = await _expenseRepository.getExpenses();
     debts = await _db.getAllDebtsWithCustomers();
 
     todaySalesTotal = await _db.getTodaySalesTotal();
@@ -70,7 +72,7 @@ class BusinessProvider extends ChangeNotifier {
   }
 
   Future<void> addExpense(Expense e) async {
-    await _db.insertExpense(e);
+    await _expenseRepository.createExpense(e);
     await refreshData();
   }
 
