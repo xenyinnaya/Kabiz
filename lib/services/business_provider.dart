@@ -6,11 +6,11 @@ import '../models/sale_item.dart';
 import '../models/expense.dart';
 import '../models/debt.dart';
 import '../database/database_helper.dart';
-import '../repositories/debt_repository.dart';
 import 'sales_service.dart';
 import 'inventory_service.dart';
 import 'customer_service.dart';
 import 'expense_service.dart';
+import 'debt_service.dart';
 import 'assistant_service.dart';
 
 class BusinessProvider extends ChangeNotifier {
@@ -18,7 +18,7 @@ class BusinessProvider extends ChangeNotifier {
   final InventoryService _inventoryService = InventoryService();
   final CustomerService _customerService = CustomerService();
   final ExpenseService _expenseService = ExpenseService();
-  final DebtRepository _debtRepository = DebtRepository();
+  final DebtService _debtService = DebtService();
   final SalesService _salesService = SalesService();
   final AssistantService _assistant = LocalAssistantService();
 
@@ -41,11 +41,11 @@ class BusinessProvider extends ChangeNotifier {
     customers = await _customerService.getCustomers();
     sales = await _salesService.getSales();
     expenses = await _expenseService.getExpenses();
-    debts = await _debtRepository.getDebtsWithCustomers();
+    debts = await _debtService.getDebtsWithCustomers();
 
     todaySalesTotal = await _db.getTodaySalesTotal();
     expensesThisMonthTotal = await _db.getExpensesThisMonthTotal();
-    outstandingDebtsTotal = await _debtRepository.getOutstandingDebtsTotal();
+    outstandingDebtsTotal = await _debtService.getOutstandingDebtsTotal();
     notifyListeners();
   }
 
@@ -81,12 +81,12 @@ class BusinessProvider extends ChangeNotifier {
   }
 
   Future<void> addDebt(Debt d) async {
-    await _debtRepository.createDebt(d);
+    await _debtService.createDebt(d);
     await refreshData();
   }
 
   Future<void> updateDebt(int debtId, String status) async {
-    await _debtRepository.updateDebtStatus(debtId, status);
+    await _debtService.updateDebtStatus(debtId, status);
     await refreshData();
   }
 
