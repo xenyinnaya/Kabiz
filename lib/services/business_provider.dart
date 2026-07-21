@@ -6,16 +6,16 @@ import '../models/sale_item.dart';
 import '../models/expense.dart';
 import '../models/debt.dart';
 import '../database/database_helper.dart';
-import '../repositories/product_repository.dart';
 import '../repositories/customer_repository.dart';
 import '../repositories/expense_repository.dart';
 import '../repositories/debt_repository.dart';
 import 'sales_service.dart';
+import 'inventory_service.dart';
 import 'assistant_service.dart';
 
 class BusinessProvider extends ChangeNotifier {
   final DatabaseHelper _db = DatabaseHelper();
-  final ProductRepository _productRepository = ProductRepository();
+  final InventoryService _inventoryService = InventoryService();
   final CustomerRepository _customerRepository = CustomerRepository();
   final ExpenseRepository _expenseRepository = ExpenseRepository();
   final DebtRepository _debtRepository = DebtRepository();
@@ -37,7 +37,7 @@ class BusinessProvider extends ChangeNotifier {
   }
 
   Future<void> refreshData() async {
-    products = await _productRepository.getProducts();
+    products = await _inventoryService.getProducts();
     customers = await _customerRepository.getCustomers();
     sales = await _salesService.getSales();
     expenses = await _expenseRepository.getExpenses();
@@ -50,17 +50,17 @@ class BusinessProvider extends ChangeNotifier {
   }
 
   Future<void> addProduct(Product p) async {
-    await _productRepository.createProduct(p);
+    await _inventoryService.createProduct(p);
     await refreshData();
   }
 
   Future<void> updateProduct(Product p) async {
-    await _productRepository.updateProduct(p);
+    await _inventoryService.updateProduct(p);
     await refreshData();
   }
 
   Future<void> deleteProduct(int id) async {
-    await _productRepository.deleteProduct(id);
+    await _inventoryService.deleteProduct(id);
     await refreshData();
   }
 
