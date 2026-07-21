@@ -6,18 +6,18 @@ import '../models/sale_item.dart';
 import '../models/expense.dart';
 import '../models/debt.dart';
 import '../database/database_helper.dart';
-import '../repositories/expense_repository.dart';
 import '../repositories/debt_repository.dart';
 import 'sales_service.dart';
 import 'inventory_service.dart';
 import 'customer_service.dart';
+import 'expense_service.dart';
 import 'assistant_service.dart';
 
 class BusinessProvider extends ChangeNotifier {
   final DatabaseHelper _db = DatabaseHelper();
   final InventoryService _inventoryService = InventoryService();
   final CustomerService _customerService = CustomerService();
-  final ExpenseRepository _expenseRepository = ExpenseRepository();
+  final ExpenseService _expenseService = ExpenseService();
   final DebtRepository _debtRepository = DebtRepository();
   final SalesService _salesService = SalesService();
   final AssistantService _assistant = LocalAssistantService();
@@ -40,7 +40,7 @@ class BusinessProvider extends ChangeNotifier {
     products = await _inventoryService.getProducts();
     customers = await _customerService.getCustomers();
     sales = await _salesService.getSales();
-    expenses = await _expenseRepository.getExpenses();
+    expenses = await _expenseService.getExpenses();
     debts = await _debtRepository.getDebtsWithCustomers();
 
     todaySalesTotal = await _db.getTodaySalesTotal();
@@ -76,7 +76,7 @@ class BusinessProvider extends ChangeNotifier {
   }
 
   Future<void> addExpense(Expense e) async {
-    await _expenseRepository.createExpense(e);
+    await _expenseService.createExpense(e);
     await refreshData();
   }
 
