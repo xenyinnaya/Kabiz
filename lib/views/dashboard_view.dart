@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/business_provider.dart';
 import '../widgets/stat_card.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_spacing.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -11,73 +14,74 @@ class DashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     final currency = NumberFormat.currency(symbol: 'BIF ', decimalDigits: 0, locale: 'fr_BI');
     final provider = Provider.of<BusinessProvider>(context);
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     final lowStockCount = provider.products.where((p) => p.stockQuantity <= p.lowStockThreshold).length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      appBar: AppBar(title: const Text('Bujumbura Assistant', style: TextStyle(fontWeight: FontWeight.bold))),
+      appBar: AppBar(title: const Text('BizMate AI')),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(AppSpacing.edgeMargin),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Muraho!', style: TextStyle(color: Colors.white54, fontSize: 14)),
-              const Text('Business Dashboard', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
+              Text('Muraho!', style: textTheme.bodyLarge?.copyWith(color: AppColors.onSurfaceVariant)),
+              Text('Business Dashboard', style: textTheme.headlineMedium?.copyWith(color: AppColors.onSurface)),
+              const SizedBox(height: AppSpacing.lg),
 
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: AppSpacing.gutter,
+                mainAxisSpacing: AppSpacing.gutter,
                 childAspectRatio: 1.4,
                 children: [
-                  StatCard(title: "Today's Sales", value: currency.format(provider.todaySalesTotal), icon: Icons.shopping_basket, gradientColors: const [Color(0xFF0D5C3A), Color(0xFF10B981)]),
-                  StatCard(title: "Expenses (Month)", value: currency.format(provider.expensesThisMonthTotal), icon: Icons.receipt_long, gradientColors: const [Color(0xFF9E2A2B), Color(0xFFEF4444)]),
-                  StatCard(title: "Outstanding Debts", value: currency.format(provider.outstandingDebtsTotal), icon: Icons.money_off, gradientColors: const [Color(0xFFB57C1E), Color(0xFFFFB300)]),
-                  StatCard(title: "Low Stock Items", value: "$lowStockCount Alerts", icon: Icons.warning_amber, gradientColors: lowStockCount > 0 ? const [Color(0xFFB45309), Color(0xFFF59E0B)] : const [Color(0xFF374151), Color(0xFF4B5563)]),
+                  StatCard(title: "Today's Sales", value: currency.format(provider.todaySalesTotal), icon: Icons.shopping_basket),
+                  StatCard(title: "Expenses (Month)", value: currency.format(provider.expensesThisMonthTotal), icon: Icons.receipt_long),
+                  StatCard(title: "Outstanding Debts", value: currency.format(provider.outstandingDebtsTotal), icon: Icons.money_off),
+                  StatCard(title: "Low Stock Items", value: "$lowStockCount Alerts", icon: Icons.warning_amber),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               SizedBox(
                 width: double.infinity,
-                height: 52,
                 child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, 
-                    foregroundColor: const Color(0xFF121212),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
                   onPressed: () => Navigator.pushNamed(context, '/record_sale'),
                   icon: const Icon(Icons.add_shopping_cart, size: 20),
-                  label: const Text('Record New Sale Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  label: const Text('Record New Sale Now'),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               if (lowStockCount > 0) ...[
-                const Text('Urgent Stock Warnings', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
+                Text('Urgent Stock Warnings', style: textTheme.headlineSmall?.copyWith(color: AppColors.onSurface)),
+                const SizedBox(height: AppSpacing.md),
                 Container(
-                  decoration: BoxDecoration(color: const Color(0xFF1E1E1E), borderRadius: BorderRadius.circular(12)),
-                  child: ListView(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  decoration: BoxDecoration(
+                    color: AppColors.errorContainer, 
+                    borderRadius: AppRadius.borderRadiusLg,
+                  ),
+                  child: ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: provider.products
-                        .where((p) => p.stockQuantity <= p.lowStockThreshold)
-                        .map((p) => ListTile(
-                              leading: const Icon(Icons.warning_amber, color: Colors.orangeAccent),
-                              title: Text(p.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                              subtitle: Text("Only ${p.stockQuantity} ${p.unit} left. Threshold: ${p.lowStockThreshold} ${p.unit}"),
-                            ))
-                        .toList(),
+                    itemCount: provider.products.where((p) => p.stockQuantity <= p.lowStockThreshold).length,
+                    separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
+                    itemBuilder: (context, index) {
+                      final p = provider.products.where((p) => p.stockQuantity <= p.lowStockThreshold).elementAt(index);
+                      return ListTile(
+                        leading: const Icon(Icons.warning_amber, color: AppColors.error),
+                        title: Text(p.name, style: textTheme.bodyLarge?.copyWith(color: AppColors.onErrorContainer, fontWeight: FontWeight.bold)),
+                        subtitle: Text("Only ${p.stockQuantity} ${p.unit} left. Threshold: ${p.lowStockThreshold} ${p.unit}", style: textTheme.bodyMedium?.copyWith(color: AppColors.onErrorContainer)),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.lg),
               ],
             ],
           ),

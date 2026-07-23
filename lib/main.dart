@@ -8,6 +8,7 @@ import 'views/expense_view.dart';
 import 'views/assistant_view.dart';
 import 'views/record_sale_view.dart';
 import 'views/home_view.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,35 +29,7 @@ class BujumburaBusinessApp extends StatelessWidget {
       title: 'Kora',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          primary: Colors.blue,
-          secondary: Colors.green,
-          brightness: Brightness.light,
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
-        cardTheme: CardTheme(
-          elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          elevation: 0,
-          backgroundColor: Color(0xFFF8F9FA),
-          foregroundColor: Colors.black87,
-        ),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          elevation: 8,
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.black54,
-          type: BottomNavigationBarType.fixed,
-        ),
-      ),
+      theme: AppTheme.lightTheme,
       initialRoute: '/',
       routes: {
         '/': (context) => const MainNavigationScreen(),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/business_provider.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_spacing.dart';
 
 class AssistantView extends StatefulWidget {
   const AssistantView({super.key});
@@ -41,13 +44,12 @@ class _AssistantViewState extends State<AssistantView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(title: const Text('AI Assistant')),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.edgeMargin),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final msg = _messages[index];
@@ -55,18 +57,20 @@ class _AssistantViewState extends State<AssistantView> {
                 return Align(
                   alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                    padding: const EdgeInsets.all(AppSpacing.gutter),
                     decoration: BoxDecoration(
-                      color: isUser ? Colors.amber : const Color(0xFF2C2C2C),
-                      borderRadius: BorderRadius.circular(16).copyWith(
+                      color: isUser ? AppColors.primaryContainer : AppColors.surfaceContainerHigh,
+                      borderRadius: AppRadius.borderRadiusLg.copyWith(
                         bottomRight: isUser ? const Radius.circular(0) : null,
                         bottomLeft: !isUser ? const Radius.circular(0) : null,
                       ),
                     ),
                     child: Text(
                       msg['text'], 
-                      style: TextStyle(color: isUser ? Colors.black : Colors.white, fontSize: 16),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: isUser ? AppColors.onPrimaryContainer : AppColors.onSurface,
+                      ),
                     ),
                   ),
                 );
@@ -74,10 +78,10 @@ class _AssistantViewState extends State<AssistantView> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.gutter),
             decoration: const BoxDecoration(
-              color: Color(0xFF1E1E1E),
-              border: Border(top: BorderSide(color: Colors.white10)),
+              color: AppColors.surface,
+              border: Border(top: BorderSide(color: AppColors.outlineVariant)),
             ),
             child: Row(
               children: [
@@ -88,17 +92,17 @@ class _AssistantViewState extends State<AssistantView> {
                     decoration: InputDecoration(
                       hintText: "Ask 'Who owes me?' or 'Sold 2 fanta at 1500'",
                       filled: true,
-                      fillColor: const Color(0xFF2C2C2C),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                      fillColor: AppColors.surfaceContainerHigh,
+                      border: OutlineInputBorder(borderRadius: AppRadius.borderRadiusXl, borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.edgeMargin, vertical: 0),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 CircleAvatar(
-                  backgroundColor: Colors.amber,
+                  backgroundColor: AppColors.primary,
                   child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.black),
+                    icon: const Icon(Icons.send, color: AppColors.onPrimary),
                     onPressed: _sendMessage,
                   ),
                 )

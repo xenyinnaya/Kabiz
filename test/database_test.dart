@@ -12,7 +12,7 @@ void main() {
       const double quantitySold = 3.5; // e.g. 3.5 kg of sugar or liters of oil
 
       // 1. Total sale calculation
-      final double totalAmountDouble = quantitySold * sellingPriceBif;
+      const double totalAmountDouble = quantitySold * sellingPriceBif;
       final int totalAmountInt = totalAmountDouble.toInt();
       
       expect(totalAmountInt, equals(7000));

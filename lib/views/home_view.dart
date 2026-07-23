@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/business_provider.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_spacing.dart';
+import '../theme/app_typography.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -12,7 +16,7 @@ class HomeView extends StatelessWidget {
     final provider = Provider.of<BusinessProvider>(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9), // Match Stitch background
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -20,16 +24,16 @@ class HomeView extends StatelessWidget {
             children: [
               _buildHeader(context),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.edgeMargin),
                 child: Column(
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.md),
                     _buildKPIBentoGrid(provider, currency),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.md),
                     _buildAIInsight(provider),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.md),
                     _buildQuickActions(context),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.lg),
                     _buildRecentActivity(context, provider, currency),
                     const SizedBox(height: 80), // Space for bottom bar
                   ],
@@ -46,9 +50,9 @@ class HomeView extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.edgeMargin, vertical: AppSpacing.gutter),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9F9F9).withOpacity(0.9),
+        color: AppColors.surface.withOpacity(0.9),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -69,48 +73,33 @@ class HomeView extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF004D99), // Primary
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.primary,
+                      borderRadius: AppRadius.borderRadiusSm,
                     ),
-                    child: const Icon(Icons.bubble_chart, color: Colors.white, size: 20),
+                    child: const Icon(Icons.bubble_chart, color: AppColors.onPrimary, size: 20),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
                     'Kora AI',
-                    style: TextStyle(
-                      fontFamily: 'Plus Jakarta Sans',
-                      color: Color(0xFF004D99),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTypography.textTheme.headlineLarge!.copyWith(color: AppColors.primary, fontSize: 20),
                   ),
                 ],
               ),
               const CircleAvatar(
                 radius: 16,
-                backgroundColor: Color(0xFF1565C0),
-                child: Icon(Icons.person, color: Colors.white, size: 20),
+                backgroundColor: AppColors.primaryContainer,
+                child: Icon(Icons.person, color: AppColors.onPrimaryContainer, size: 20),
               )
             ],
           ),
-          const SizedBox(height: 12),
-          const Text(
+          const SizedBox(height: AppSpacing.gutter),
+          Text(
             'Mwaramutse, Business Owner 👋',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              color: Color(0xFF1A1C1C),
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTypography.textTheme.headlineSmall!.copyWith(color: AppColors.onSurface, fontSize: 16),
           ),
           Text(
             DateFormat('EEEE, d MMMM').format(DateTime.now()),
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              color: Color(0xFF424752),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTypography.textTheme.labelLarge!.copyWith(color: AppColors.onSurfaceVariant),
           ),
         ],
       ),
@@ -124,24 +113,24 @@ class HomeView extends StatelessWidget {
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
+      crossAxisSpacing: AppSpacing.gutter,
+      mainAxisSpacing: AppSpacing.gutter,
       childAspectRatio: 1.5,
       children: [
-        _buildKPICard("Sales", currency.format(provider.todaySalesTotal), "Today", Icons.trending_up, const Color(0xFF1565C0), const Color(0xFFDAE5FF)),
-        _buildKPICard("Expenses", currency.format(provider.expensesThisMonthTotal), "This Month", Icons.account_balance_wallet, const Color(0xFFA0F399), const Color(0xFF217128)),
-        _buildKPICard("Debts", currency.format(provider.outstandingDebtsTotal), "Outstanding", Icons.assignment_late, const Color(0xFFFFDAD6), const Color(0xFF93000A)),
-        _buildKPICard("Stock", "$lowStockCount items", "Low alerts", Icons.inventory_2, const Color(0xFF00575F), Colors.white),
+        _buildKPICard("Sales", currency.format(provider.todaySalesTotal), "Today", Icons.trending_up, AppColors.primaryContainer, AppColors.onPrimaryContainer),
+        _buildKPICard("Expenses", currency.format(provider.expensesThisMonthTotal), "This Month", Icons.account_balance_wallet, AppColors.secondaryContainer, AppColors.onSecondaryContainer),
+        _buildKPICard("Debts", currency.format(provider.outstandingDebtsTotal), "Outstanding", Icons.assignment_late, AppColors.errorContainer, AppColors.onErrorContainer),
+        _buildKPICard("Stock", "$lowStockCount items", "Low alerts", Icons.inventory_2, AppColors.tertiary, AppColors.onTertiary),
       ],
     );
   }
 
   Widget _buildKPICard(String title, String value, String subtitle, IconData icon, Color bgColor, Color textColor) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.gutter),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderRadiusLg,
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.04), offset: const Offset(0, 4), blurRadius: 4)
         ],
@@ -154,7 +143,7 @@ class HomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(icon, color: textColor.withOpacity(0.8), size: 18),
-              Text(title.toUpperCase(), style: TextStyle(color: textColor.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+              Text(title.toUpperCase(), style: AppTypography.textTheme.labelLarge!.copyWith(color: textColor.withOpacity(0.7), fontSize: 10)),
             ],
           ),
           Column(
@@ -162,9 +151,9 @@ class HomeView extends StatelessWidget {
             children: [
               FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text(value, style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+                child: Text(value, style: AppTypography.textTheme.bodyLarge!.copyWith(color: textColor, fontSize: 16)),
               ),
-              Text(subtitle, style: TextStyle(color: textColor.withOpacity(0.8), fontSize: 11, fontFamily: 'Inter')),
+              Text(subtitle, style: AppTypography.textTheme.labelLarge!.copyWith(color: textColor.withOpacity(0.8), fontSize: 11)),
             ],
           ),
         ],
@@ -194,24 +183,24 @@ class HomeView extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.gutter),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFC2C6D4)),
+        color: AppColors.surface,
+        borderRadius: AppRadius.borderRadiusLg,
+        border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: const Color(0xFF004D99).withOpacity(0.1), shape: BoxShape.circle),
-            child: const Icon(Icons.auto_awesome, color: Color(0xFF004D99), size: 20),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(color: AppColors.primaryContainer.withOpacity(0.3), shape: BoxShape.circle),
+            child: const Icon(Icons.auto_awesome, color: AppColors.primary, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.gutter),
           Expanded(
             child: Text(
               insightText,
-              style: const TextStyle(fontFamily: 'Inter', color: Color(0xFF424752), fontSize: 14),
+              style: AppTypography.textTheme.bodyMedium!.copyWith(color: AppColors.onSurfaceVariant, fontSize: 14),
             ),
           )
         ],
@@ -224,8 +213,8 @@ class HomeView extends StatelessWidget {
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
+      crossAxisSpacing: AppSpacing.gutter,
+      mainAxisSpacing: AppSpacing.gutter,
       childAspectRatio: 2.8,
       children: [
         _buildActionButton(context, "Record Sale", Icons.add_shopping_cart, false, () {
@@ -237,13 +226,11 @@ class HomeView extends StatelessWidget {
           );
         }),
         _buildActionButton(context, "Add Expense", Icons.payments, false, () {
-          // Placeholder action for Add Expense from dashboard
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Navigate to Expense section to add expenses.')),
           );
         }),
         _buildActionButton(context, "Voice Sale", Icons.mic, true, () {
-          // Future functionality, open assistant
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Voice recording will be available soon. Please use AI Chat.')),
           );
@@ -254,29 +241,27 @@ class HomeView extends StatelessWidget {
 
   Widget _buildActionButton(BuildContext context, String title, IconData icon, bool isPrimary, VoidCallback onTap) {
     return Material(
-      color: isPrimary ? const Color(0xFF004D99) : const Color(0xFFF3F3F3),
-      borderRadius: BorderRadius.circular(16),
+      color: isPrimary ? AppColors.primary : AppColors.surfaceContainerHigh,
+      borderRadius: AppRadius.borderRadiusLg,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderRadiusLg,
         child: Container(
           decoration: BoxDecoration(
-            border: isPrimary ? null : Border.all(color: const Color(0xFFC2C6D4)),
-            borderRadius: BorderRadius.circular(16),
+            border: isPrimary ? null : Border.all(color: AppColors.outlineVariant),
+            borderRadius: AppRadius.borderRadiusLg,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
           child: Row(
             children: [
-              Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF004D99), size: 20),
-              const SizedBox(width: 8),
+              Icon(icon, color: isPrimary ? AppColors.onPrimary : AppColors.primary, size: 20),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    color: isPrimary ? Colors.white : const Color(0xFF1A1C1C),
+                  style: AppTypography.textTheme.labelLarge!.copyWith(
+                    color: isPrimary ? AppColors.onPrimary : AppColors.onSurface,
                     fontSize: 13,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -294,23 +279,22 @@ class HomeView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'RECENT ACTIVITY',
-              style: TextStyle(color: Color(0xFF727783), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+              style: AppTypography.textTheme.labelLarge!.copyWith(color: AppColors.outline, fontSize: 12),
             ),
             TextButton(
-              onPressed: () {}, // Future View All functionality
-              child: const Text('View All', style: TextStyle(color: Color(0xFF004D99), fontSize: 12, fontWeight: FontWeight.bold)),
+              onPressed: () {}, 
+              child: Text('View All', style: AppTypography.textTheme.labelLarge!.copyWith(color: AppColors.primary, fontSize: 12)),
             )
           ],
         ),
         if (provider.sales.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Center(child: Text("No recent sales.", style: TextStyle(color: Colors.grey))),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+            child: Center(child: Text("No recent sales.", style: AppTypography.textTheme.bodyMedium!.copyWith(color: AppColors.outline))),
           ),
         ...provider.sales.take(3).map((sale) {
-          // sale keys: id, total_amount_bif, created_at, customer_name, customer_phone
           final amount = sale['total_amount_bif'];
           final dateStr = sale['created_at'];
           final customerName = sale['customer_name'] ?? 'Unknown Customer';
@@ -324,33 +308,33 @@ class HomeView extends StatelessWidget {
           final formattedDate = DateFormat('MMM d, h:mm a').format(parsedDate);
 
           return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacing.gutter),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFC2C6D4).withOpacity(0.3)),
+              color: AppColors.surface,
+              borderRadius: AppRadius.borderRadiusMd,
+              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.3)),
             ),
             child: Row(
               children: [
                 Container(
                   width: 36, height: 36,
-                  decoration: BoxDecoration(color: const Color(0xFFEEEEEE), borderRadius: BorderRadius.circular(8)),
-                  child: const Icon(Icons.shopping_bag, color: Color(0xFF424752), size: 18),
+                  decoration: BoxDecoration(color: AppColors.surfaceContainerHigh, borderRadius: AppRadius.borderRadiusSm),
+                  child: const Icon(Icons.shopping_bag, color: AppColors.onSurfaceVariant, size: 18),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.gutter),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(customerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1A1C1C))),
-                      Text(formattedDate, style: const TextStyle(color: Color(0xFF424752), fontSize: 12)),
+                      Text(customerName, style: AppTypography.textTheme.bodyMedium!.copyWith(color: AppColors.onSurface)),
+                      Text(formattedDate, style: AppTypography.textTheme.labelLarge!.copyWith(color: AppColors.onSurfaceVariant)),
                     ],
                   ),
                 ),
                 Text(
                   '+${currency.format(amount)}',
-                  style: const TextStyle(color: Color(0xFF1B6D24), fontWeight: FontWeight.bold, fontSize: 14),
+                  style: AppTypography.textTheme.bodyMedium!.copyWith(color: AppColors.secondary),
                 ),
               ],
             ),
@@ -362,19 +346,17 @@ class HomeView extends StatelessWidget {
 
   Widget _buildAIFloatingBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.edgeMargin, vertical: AppSpacing.sm),
       child: GestureDetector(
         onTap: () {
-          // Find the MainNavigationScreen state to switch tabs, or push a route.
-          // Since we want to preview it, let's just push a route to the existing AssistantView.
           Navigator.pushNamed(context, '/assistant');
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.95),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFF004D99).withOpacity(0.1)),
+            color: AppColors.surface.withOpacity(0.95),
+            borderRadius: AppRadius.borderRadiusXl,
+            border: Border.all(color: AppColors.primary.withOpacity(0.1)),
             boxShadow: [
               BoxShadow(color: Colors.black.withOpacity(0.1), offset: const Offset(0, 4), blurRadius: 12)
             ],
@@ -383,17 +365,17 @@ class HomeView extends StatelessWidget {
             children: [
               Container(
                 width: 36, height: 36,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.attach_file, color: Color(0xFF004D99), size: 20),
+                decoration: BoxDecoration(borderRadius: AppRadius.borderRadiusMd),
+                child: const Icon(Icons.attach_file, color: AppColors.primary, size: 20),
               ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text('Ask Kora...', style: TextStyle(color: Colors.grey, fontSize: 14)),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text('Ask Kora...', style: AppTypography.textTheme.bodyMedium!.copyWith(color: AppColors.outline)),
               ),
               Container(
                 width: 36, height: 36,
-                decoration: BoxDecoration(color: const Color(0xFF004D99), borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.send, color: Colors.white, size: 16),
+                decoration: BoxDecoration(color: AppColors.primary, borderRadius: AppRadius.borderRadiusMd),
+                child: const Icon(Icons.send, color: AppColors.onPrimary, size: 16),
               ),
             ],
           ),
