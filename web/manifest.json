@@ -1,6 +1,6 @@
 {
-    "name": "Kabiz Smart Assistant",
-    "short_name": "Kabiz Smart Assistant",
+    "name": "Kabiz",
+    "short_name": "Kabiz",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

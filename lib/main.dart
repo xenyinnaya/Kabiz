@@ -18,18 +18,18 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => BusinessProvider(),
-      child: const BujumburaBusinessApp(),
+      child: const KabizApp(),
     ),
   );
 }
 
-class BujumburaBusinessApp extends StatelessWidget {
-  const BujumburaBusinessApp({super.key});
+class KabizApp extends StatelessWidget {
+  const KabizApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Kora',
+      title: 'Kabiz',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: AppTheme.lightTheme,
