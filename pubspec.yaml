@@ -2,7 +2,7 @@ name: bujumbura_business_assistant
 description: "An offline-first AI Business Assistant for small and medium businesses in Bujumbura, Burundi."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -14,7 +14,7 @@ dependencies:
   path: ^1.8.3
   intl: ^0.19.0
   provider: ^6.1.2
-  google_fonts: ^6.1.0
+  google_fonts: ^8.2.1
   font_awesome_flutter: ^10.7.0
 
 dev_dependencies:

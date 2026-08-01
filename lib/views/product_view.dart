@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../services/business_provider.dart';
 import '../models/product.dart';
+import '../widgets/stitch_product_card.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_typography.dart';
 
 class ProductView extends StatefulWidget {
   const ProductView({super.key});
+
   @override
   State<ProductView> createState() => _ProductViewState();
 }
@@ -19,53 +21,185 @@ class _ProductViewState extends State<ProductView> {
 
   @override
   Widget build(BuildContext context) {
-    final currency = NumberFormat.currency(symbol: 'BIF ', decimalDigits: 0, locale: 'fr_BI');
     final provider = Provider.of<BusinessProvider>(context);
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
     final filtered = provider.products.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Product Inventory')),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSpacing.edgeMargin),
-        child: Column(
-          children: [
-            TextField(
-              controller: _search,
-              onChanged: (v) => setState(() => _query = v),
-              decoration: const InputDecoration(
-                hintText: 'Search products...',
-                prefixIcon: Icon(Icons.search),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Inventory Management'),
+        elevation: 0,
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.onSurface,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.edgeMargin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppSpacing.sm),
+              _buildHeaderSection(context, provider.products.length, filtered.length),
+              const SizedBox(height: AppSpacing.md),
+              _buildSearchField(),
+              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: filtered.isEmpty
+                    ? _buildEmptyState(context)
+                    : ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 80),
+                        itemCount: filtered.length,
+                        separatorBuilder: (c, i) => const SizedBox(height: AppSpacing.sm),
+                        itemBuilder: (c, i) {
+                          final p = filtered[i];
+                          return StitchProductCard(
+                            product: p,
+                            onTap: () => _showAddProductDialog(context, product: p),
+                            onEdit: () => _showAddProductDialog(context, product: p),
+                          );
+                        },
+                      ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Expanded(
-              child: ListView.separated(
-                itemCount: filtered.length,
-                separatorBuilder: (c, i) => const SizedBox(height: AppSpacing.sm),
-                itemBuilder: (c, i) {
-                  final p = filtered[i];
-                  final isLow = p.stockQuantity <= p.lowStockThreshold;
-                  return Card(
-                    margin: EdgeInsets.zero,
-                    child: ListTile(
-                      leading: Icon(Icons.inventory_2, color: isLow ? AppColors.error : AppColors.primary),
-                      title: Text(p.name, style: textTheme.bodyLarge?.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold)),
-                      subtitle: Text("Cost: ${currency.format(p.costPriceBif)} | Sell: ${currency.format(p.sellingPriceBif)}", style: textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
-                      trailing: Text("${p.stockQuantity} ${p.unit}", style: textTheme.bodyMedium?.copyWith(color: isLow ? AppColors.error : AppColors.onSurface, fontWeight: FontWeight.bold)),
-                      onTap: () => _showAddProductDialog(context, product: p),
-                    ),
-                  );
-                },
-              ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.onPrimary,
+        shape: const CircleBorder(),
+        elevation: 3,
         onPressed: () => _showAddProductDialog(context),
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection(BuildContext context, int totalCount, int filteredCount) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Stock Items',
+              style: AppTypography.textTheme.headlineSmall?.copyWith(
+                color: AppColors.onSurface,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            Text(
+              'Manage products, prices & stock levels',
+              style: AppTypography.textTheme.labelMedium?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.xs),
+          decoration: BoxDecoration(
+            color: AppColors.primaryContainer.withOpacity(0.3),
+            borderRadius: AppRadius.borderRadiusXl,
+          ),
+          child: Text(
+            '$filteredCount of $totalCount',
+            style: AppTypography.textTheme.labelLarge?.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _search,
+      onChanged: (v) => setState(() => _query = v),
+      style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.onSurface),
+      decoration: InputDecoration(
+        hintText: 'Search products by name...',
+        hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.outline),
+        prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+        suffixIcon: _query.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear, color: AppColors.outline),
+                onPressed: () {
+                  _search.clear();
+                  setState(() => _query = '');
+                },
+              )
+            : null,
+        filled: true,
+        fillColor: AppColors.surfaceContainerHigh,
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.borderRadiusLg,
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    final isSearching = _query.isNotEmpty;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerHigh,
+                  borderRadius: AppRadius.borderRadiusXl,
+                ),
+                child: const Icon(
+                  Icons.inventory_2_outlined,
+                  color: AppColors.outline,
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                isSearching ? 'No matching products found' : 'No products in inventory yet',
+                style: AppTypography.textTheme.titleMedium?.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                isSearching
+                    ? 'Try searching with a different keyword or clear the search bar.'
+                    : 'Tap the button below to add your first product to the catalog.',
+                style: AppTypography.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              ElevatedButton.icon(
+                onPressed: () => _showAddProductDialog(context),
+                icon: const Icon(Icons.add),
+                label: const Text('Add Product Now'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(180, 48),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -84,11 +218,16 @@ class _ProductViewState extends State<ProductView> {
     showDialog(
       context: context,
       builder: (context) {
-        final theme = Theme.of(context);
         return AlertDialog(
           backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusLg),
-          title: Text(isEdit ? 'Edit Product' : 'Add Product', style: theme.textTheme.headlineSmall?.copyWith(color: AppColors.onSurface)),
+          title: Text(
+            isEdit ? 'Edit Product' : 'Add Product',
+            style: AppTypography.textTheme.headlineSmall?.copyWith(
+              color: AppColors.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -97,9 +236,10 @@ class _ProductViewState extends State<ProductView> {
                 children: [
                   TextFormField(
                     initialValue: name,
-                    decoration: const InputDecoration(labelText: 'Name'),
-                    validator: (v) => v!.isEmpty ? 'Enter name' : null,
-                    onSaved: (v) => name = v!,
+                    style: AppTypography.textTheme.bodyLarge?.copyWith(color: AppColors.onSurface),
+                    decoration: const InputDecoration(labelText: 'Product Name'),
+                    validator: (v) => v == null || v.trim().isEmpty ? 'Enter product name' : null,
+                    onSaved: (v) => name = v!.trim(),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Row(
@@ -108,8 +248,9 @@ class _ProductViewState extends State<ProductView> {
                         child: TextFormField(
                           initialValue: isEdit ? qty.toString() : '',
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          style: AppTypography.textTheme.bodyLarge?.copyWith(color: AppColors.onSurface),
                           decoration: const InputDecoration(labelText: 'Stock Qty'),
-                          validator: (v) => double.tryParse(v!) == null ? 'Number required' : null,
+                          validator: (v) => double.tryParse(v ?? '') == null ? 'Number required' : null,
                           onSaved: (v) => qty = double.parse(v!),
                         ),
                       ),
@@ -117,9 +258,10 @@ class _ProductViewState extends State<ProductView> {
                       Expanded(
                         child: TextFormField(
                           initialValue: unit,
-                          decoration: const InputDecoration(labelText: 'Unit (e.g., kg)'),
-                          validator: (v) => v!.isEmpty ? 'Unit required' : null,
-                          onSaved: (v) => unit = v!,
+                          style: AppTypography.textTheme.bodyLarge?.copyWith(color: AppColors.onSurface),
+                          decoration: const InputDecoration(labelText: 'Unit (e.g., kg, bottle)'),
+                          validator: (v) => v == null || v.trim().isEmpty ? 'Unit required' : null,
+                          onSaved: (v) => unit = v!.trim(),
                         ),
                       ),
                     ],
@@ -131,18 +273,20 @@ class _ProductViewState extends State<ProductView> {
                         child: TextFormField(
                           initialValue: isEdit ? cost.toString() : '',
                           keyboardType: TextInputType.number,
+                          style: AppTypography.textTheme.bodyLarge?.copyWith(color: AppColors.onSurface),
                           decoration: const InputDecoration(labelText: 'Cost Price (BIF)'),
-                          validator: (v) => int.tryParse(v!) == null ? 'Integer required' : null,
+                          validator: (v) => int.tryParse(v ?? '') == null ? 'Integer required' : null,
                           onSaved: (v) => cost = int.parse(v!),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: TextFormField(
                           initialValue: isEdit ? sell.toString() : '',
                           keyboardType: TextInputType.number,
+                          style: AppTypography.textTheme.bodyLarge?.copyWith(color: AppColors.onSurface),
                           decoration: const InputDecoration(labelText: 'Selling Price (BIF)'),
-                          validator: (v) => int.tryParse(v!) == null ? 'Integer required' : null,
+                          validator: (v) => int.tryParse(v ?? '') == null ? 'Integer required' : null,
                           onSaved: (v) => sell = int.parse(v!),
                         ),
                       ),
@@ -152,8 +296,9 @@ class _ProductViewState extends State<ProductView> {
                   TextFormField(
                     initialValue: isEdit ? threshold.toString() : '5.0',
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Low Stock Threshold'),
-                    validator: (v) => double.tryParse(v!) == null ? 'Number required' : null,
+                    style: AppTypography.textTheme.bodyLarge?.copyWith(color: AppColors.onSurface),
+                    decoration: const InputDecoration(labelText: 'Low Stock Alert Threshold'),
+                    validator: (v) => double.tryParse(v ?? '') == null ? 'Number required' : null,
                     onSaved: (v) => threshold = double.parse(v!),
                   ),
                 ],
@@ -163,14 +308,14 @@ class _ProductViewState extends State<ProductView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: theme.textTheme.labelLarge?.copyWith(color: AppColors.outline)),
+              child: Text('Cancel', style: AppTypography.textTheme.labelLarge?.copyWith(color: AppColors.outline)),
             ),
             ElevatedButton(
               onPressed: () {
                 if (formKey.currentState!.validate()) {
                   formKey.currentState!.save();
                   final provider = Provider.of<BusinessProvider>(context, listen: false);
-                  
+
                   if (isEdit) {
                     provider.updateProduct(product.copyWith(
                       name: name,
@@ -194,6 +339,9 @@ class _ProductViewState extends State<ProductView> {
                   Navigator.pop(context);
                 }
               },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(120, 44),
+              ),
               child: Text(isEdit ? 'Save Changes' : 'Add Product'),
             ),
           ],

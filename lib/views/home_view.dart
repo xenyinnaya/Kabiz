@@ -226,14 +226,10 @@ class HomeView extends StatelessWidget {
           );
         }),
         _buildActionButton(context, "Add Expense", Icons.payments, false, () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Navigate to Expense section to add expenses.')),
-          );
+          Navigator.pushNamed(context, '/expense');
         }),
         _buildActionButton(context, "Voice Sale", Icons.mic, true, () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Voice recording will be available soon. Please use AI Chat.')),
-          );
+          Navigator.pushNamed(context, '/assistant');
         }),
       ],
     );
@@ -284,7 +280,9 @@ class HomeView extends StatelessWidget {
               style: AppTypography.textTheme.labelLarge!.copyWith(color: AppColors.outline, fontSize: 12),
             ),
             TextButton(
-              onPressed: () {}, 
+              onPressed: () {
+                Navigator.pushNamed(context, '/dashboard');
+              }, 
               child: Text('View All', style: AppTypography.textTheme.labelLarge!.copyWith(color: AppColors.primary, fontSize: 12)),
             )
           ],

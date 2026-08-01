@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../services/business_provider.dart';
 import '../models/customer.dart';
 import '../models/product.dart';
 import '../models/sale.dart';
 import '../models/sale_item.dart';
+import '../widgets/stitch_sale_product_selector.dart';
+import '../widgets/stitch_amount_card.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_typography.dart';
 
 class RecordSaleView extends StatefulWidget {
   const RecordSaleView({super.key});
@@ -20,7 +22,6 @@ class RecordSaleView extends StatefulWidget {
 class _RecordSaleViewState extends State<RecordSaleView> {
   Customer? _selectedCustomer;
   final List<_SaleItemEntry> _items = [];
-  final _currency = NumberFormat.currency(symbol: 'BIF ', decimalDigits: 0, locale: 'fr_BI');
 
   @override
   void initState() {
@@ -71,121 +72,231 @@ class _RecordSaleViewState extends State<RecordSaleView> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<BusinessProvider>(context);
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Record Transaction')),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSpacing.edgeMargin),
-        child: Column(
-          children: [
-            // Customer Selection
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.edgeMargin, vertical: AppSpacing.unit),
-              decoration: BoxDecoration(
-                color: AppColors.surface, 
-                borderRadius: AppRadius.borderRadiusLg,
-                border: Border.all(color: AppColors.outlineVariant),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Record Transaction'),
+        elevation: 0,
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.onSurface,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.edgeMargin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: AppSpacing.md),
+              _buildCustomerSelectorCard(provider),
+              const SizedBox(height: AppSpacing.md),
+              _buildItemHeader(),
+              const SizedBox(height: AppSpacing.sm),
+              _buildItemsList(provider),
+              const SizedBox(height: AppSpacing.sm),
+              _buildAddProductButton(),
+              const SizedBox(height: AppSpacing.lg),
+              StitchAmountCard(
+                title: "Grand Total",
+                amountBif: _grandTotal,
               ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<Customer>(
-                  isExpanded: true,
-                  hint: Text('Select Customer (Optional)', style: textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
-                  value: _selectedCustomer,
-                  items: provider.customers.map((c) {
-                    return DropdownMenuItem(value: c, child: Text(c.name, style: textTheme.bodyLarge?.copyWith(color: AppColors.onSurface)));
-                  }).toList(),
-                  onChanged: (val) => setState(() => _selectedCustomer = val),
+              const SizedBox(height: AppSpacing.lg),
+              _buildSubmitButton(),
+              const SizedBox(height: AppSpacing.xl),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.gutter),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.borderRadiusLg,
+        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.5)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.primaryContainer.withOpacity(0.3),
+              borderRadius: AppRadius.borderRadiusSm,
+            ),
+            child: const Icon(Icons.add_shopping_cart, color: AppColors.primary, size: 22),
+          ),
+          const SizedBox(width: AppSpacing.gutter),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Record Sale',
+                style: AppTypography.textTheme.titleLarge?.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            
-            // Items List
-            Expanded(
-              child: ListView.separated(
-                itemCount: _items.length,
-                separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.gutter),
-                itemBuilder: (context, index) {
-                  final item = _items[index];
-                  return Container(
-                    padding: const EdgeInsets.all(AppSpacing.gutter),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.outlineVariant),
-                      borderRadius: AppRadius.borderRadiusLg,
-                      color: AppColors.surface,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<Product>(
-                              isExpanded: true,
-                              hint: Text('Product', style: textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant)),
-                              value: item.product,
-                              items: provider.products.map((p) {
-                                return DropdownMenuItem(value: p, child: Text(p.name, overflow: TextOverflow.ellipsis, style: textTheme.bodyLarge?.copyWith(color: AppColors.onSurface)));
-                              }).toList(),
-                              onChanged: (val) => setState(() => item.product = val),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.gutter),
-                        Expanded(
-                          flex: 1,
-                          child: TextFormField(
-                            initialValue: item.quantity > 0 ? item.quantity.toString() : '',
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            decoration: const InputDecoration(labelText: 'Qty'),
-                            onChanged: (val) => setState(() => item.quantity = double.tryParse(val) ?? 0),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle, color: AppColors.error),
-                          onPressed: () {
-                            setState(() {
-                              _items.removeAt(index);
-                              if (_items.isEmpty) _items.add(_SaleItemEntry());
-                            });
-                          },
-                        )
-                      ],
-                    ),
-                  );
-                },
+              Text(
+                'Create a new transaction',
+                style: AppTypography.textTheme.labelMedium?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-            // Add Item Button
-            TextButton.icon(
-              onPressed: () => setState(() => _items.add(_SaleItemEntry())),
-              icon: const Icon(Icons.add, color: AppColors.primary),
-              label: Text('Add Another Product', style: textTheme.labelLarge?.copyWith(color: AppColors.primary)),
+  Widget _buildCustomerSelectorCard(BusinessProvider provider) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.gutter),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.borderRadiusLg,
+        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'CUSTOMER (OPTIONAL)',
+            style: AppTypography.textTheme.labelMedium?.copyWith(
+              color: AppColors.outline,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+              fontSize: 11,
             ),
-            
-            const Divider(color: AppColors.outlineVariant, height: AppSpacing.xl),
-            
-            // Grand Total
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Grand Total:', style: textTheme.titleMedium?.copyWith(color: AppColors.onSurfaceVariant)),
-                Text(_currency.format(_grandTotal), style: textTheme.headlineSmall?.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-
-            // Submit Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saveSale,
-                child: const Text('Complete Sale'),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<Customer>(
+              isExpanded: true,
+              hint: Text(
+                'Select Customer or Walk-in',
+                style: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.outline),
               ),
-            )
-          ],
+              value: _selectedCustomer,
+              items: provider.customers.map((c) {
+                return DropdownMenuItem<Customer>(
+                  value: c,
+                  child: Text(
+                    c.name,
+                    style: AppTypography.textTheme.bodyLarge?.copyWith(color: AppColors.onSurface),
+                  ),
+                );
+              }).toList(),
+              onChanged: (val) => setState(() => _selectedCustomer = val),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'PRODUCTS TO SELL',
+          style: AppTypography.textTheme.labelMedium?.copyWith(
+            color: AppColors.outline,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            fontSize: 11,
+          ),
+        ),
+        Text(
+          '${_items.length} item(s)',
+          style: AppTypography.textTheme.labelSmall?.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItemsList(BusinessProvider provider) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _items.length,
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+      itemBuilder: (context, index) {
+        final item = _items[index];
+        return StitchSaleProductSelector(
+          selectedProduct: item.product,
+          availableProducts: provider.products,
+          quantity: item.quantity,
+          onProductChanged: (val) => setState(() => item.product = val),
+          onQuantityChanged: (val) => setState(() => item.quantity = val),
+          onRemove: () {
+            setState(() {
+              _items.removeAt(index);
+              if (_items.isEmpty) _items.add(_SaleItemEntry());
+            });
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildAddProductButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => setState(() => _items.add(_SaleItemEntry())),
+        icon: const Icon(Icons.add, color: AppColors.primary, size: 20),
+        label: Text(
+          'Add Another Product',
+          style: AppTypography.textTheme.labelLarge?.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AppColors.primary, width: 1.5),
+          minimumSize: const Size.fromHeight(48),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadius.borderRadiusLg,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: _saveSale,
+        icon: const Icon(Icons.check_circle_outline, size: 22, color: AppColors.onPrimary),
+        label: Text(
+          'Complete Sale',
+          style: AppTypography.textTheme.labelLarge?.copyWith(
+            color: AppColors.onPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadius.borderRadiusLg,
+          ),
+          elevation: 2,
+          shadowColor: AppColors.primary.withOpacity(0.25),
         ),
       ),
     );

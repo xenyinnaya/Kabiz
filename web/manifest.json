@@ -1,6 +1,6 @@
 {
-    "name": "bujumbura_business_assistant",
-    "short_name": "bujumbura_business_assistant",
+    "name": "Kabiz Smart Assistant",
+    "short_name": "Kabiz Smart Assistant",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

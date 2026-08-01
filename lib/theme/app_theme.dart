@@ -39,7 +39,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.background,
       textTheme: AppTypography.textTheme,
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         shadowColor: Colors.black.withOpacity(0.08),

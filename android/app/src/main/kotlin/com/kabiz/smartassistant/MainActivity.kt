@@ -1,4 +1,4 @@
-package com.example.bujumbura_business_assistant
+package com.kabiz.smartassistant
 
 import io.flutter.embedding.android.FlutterActivity
 
