@@ -2,7 +2,7 @@ name: bujumbura_business_assistant
 description: "Kabiz: An offline-first AI Business Assistant for small and medium enterprises."
 publish_to: 'none'
 
-version: 1.0.0+2
+version: 1.0.1+3
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
