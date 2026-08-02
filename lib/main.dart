@@ -29,7 +29,7 @@ class KabizApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Kabiz',
+      title: 'KaBiz Smart Assistant',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: AppTheme.lightTheme,

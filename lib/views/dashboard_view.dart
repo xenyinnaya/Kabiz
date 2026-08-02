@@ -20,7 +20,7 @@ class DashboardView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('BizMate AI Dashboard'),
+        title: const Text('KaBiz Smart Dashboard'),
         elevation: 0,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.onSurface,

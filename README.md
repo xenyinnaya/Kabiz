@@ -17,7 +17,7 @@ An offline-first AI Business Assistant designed for Small and Medium Enterprises
 - 💳 **Debt & Credit Tracking**: Record customer credit/debts, manage repayment histories, and monitor outstanding balances.
 - 💸 **Expense Tracking**: Categorize daily operating expenses to keep track of store cash flow and net profits.
 - 📊 **Business Analytics & Dashboard**: Summarized revenue, expense, and debt statistics with clear visual metrics.
-- 🤖 **Kabiz AI Assistant**: Intelligent business guidance interface tailored for local enterprise insights.
+- 🤖 **KaBiz Smart Assistant**: Intelligent business guidance interface tailored for local enterprise insights.
 - 📱 **Cross-Platform Support**: Optimized for Android devices and responsive Web browsers.
 
 ---

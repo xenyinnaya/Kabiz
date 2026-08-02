@@ -80,7 +80,7 @@ class HomeView extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
-                    'Kabiz AI',
+                    'KaBiz Smart Assistant',
                     style: AppTypography.textTheme.headlineLarge!.copyWith(color: AppColors.primary, fontSize: 20),
                   ),
                 ],
@@ -162,7 +162,7 @@ class HomeView extends StatelessWidget {
   }
 
   Widget _buildAIInsight(BusinessProvider provider) {
-    String insightText = "Kabiz AI: Your business is performing well today.";
+    String insightText = "KaBiz Assistant: Your business is performing well today.";
     
     // Priority 1: Overdue Debts
     final overdueDebts = provider.debts.where((d) {
@@ -368,7 +368,7 @@ class HomeView extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text('Ask Kabiz...', style: AppTypography.textTheme.bodyMedium!.copyWith(color: AppColors.outline)),
+                child: Text('Ask KaBiz...', style: AppTypography.textTheme.bodyMedium!.copyWith(color: AppColors.outline)),
               ),
               Container(
                 width: 36, height: 36,

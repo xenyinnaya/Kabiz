@@ -113,6 +113,6 @@ class LocalAssistantService implements AssistantService {
       return "Recorded expenses this month: ${_currencyFormatter.format(total)}.";
     }
 
-    return "Hello! I am your Kabiz Smart Assistant.\n\nYou can ask:\n- 'How much did I sell today?'\n- 'Who owes me money?'\n- 'Which products are low?'\n- 'What are my expenses this month?'";
+    return "Hello! I am your KaBiz Smart Assistant.\n\nYou can ask:\n- 'How much did I sell today?'\n- 'Who owes me money?'\n- 'Which products are low?'\n- 'What are my expenses this month?'";
   }
 }
