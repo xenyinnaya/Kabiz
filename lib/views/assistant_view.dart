@@ -44,7 +44,7 @@ class _AssistantViewState extends State<AssistantView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('AI Assistant')),
+      appBar: AppBar(title: const Text('KaBiz Smart Assistant')),
       body: Column(
         children: [
           Expanded(

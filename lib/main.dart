@@ -116,7 +116,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.auto_awesome_outlined),
             activeIcon: Icon(Icons.auto_awesome),
-            label: 'AI Assistant',
+            label: 'KaBiz Assistant',
           ),
         ],
       ),
